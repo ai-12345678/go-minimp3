@@ -29,7 +29,9 @@ func Decode(mp3Data []byte) (*Waveform, error) {
 		return nil, ErrNoData
 	}
 	var info C.mp3dec_file_info_t
-	defer C.free(unsafe.Pointer(info.buffer))
+	defer func() {
+		C.free(unsafe.Pointer(info.buffer))
+	}()
 	if errCode := C.decode(&info, (*C.uint8_t)(unsafe.SliceData(mp3Data)), C.size_t(len(mp3Data))); errCode != 0 {
 		return nil, fmt.Errorf("minimp3: decode failed. errCode: %d", errCode)
 	}
